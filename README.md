@@ -147,3 +147,13 @@ Afinar detalles de logs (printf) para que no se mezclen.
 # Objetivo final de la sesión:
 Estar listo para defensa.
 
+# Resumen: 
+Sesión | Objetivo
+1 | Hilos, mutexes, usleep, gettimeofday
+2 | Definir structs (t_philo, t_data)
+3 | Inicializar datos y crear hilos
+4 | Implementar ciclo de vida (comer, dormir, pensar)
+5 | Detectar muerte y terminar simulación
+6 | Manejar número de comidas
+7 | Memoria, errores, makefile
+8 | Testing brutal y afinar logs
