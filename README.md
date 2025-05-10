@@ -157,3 +157,6 @@ Sesión | Objetivo
 6 | Manejar número de comidas
 7 | Memoria, errores, makefile
 8 | Testing brutal y afinar logs
+
+(Thinking) ---> (Take forks) ---> (Eating) ---> (Drop forks) ---> (Sleeping) ---> (Thinking) ...
+

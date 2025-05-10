@@ -3,102 +3,90 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ypacileo <ypacileo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: yuliano <yuliano@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 18:18:50 by ypacileo          #+#    #+#             */
-/*   Updated: 2025/04/26 18:32:09 by ypacileo         ###   ########.fr       */
+/*   Updated: 2025/05/11 00:04:57 by yuliano          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-#include <stdio.h>
-#include <pthread.h>
-#include <sys/time.h>
-#include <unistd.h>
 
-pthread_mutex_t fork_mutex;
-
-// Función para simular dormir una cantidad de milisegundos
-void precise_sleep(int ms)
+int ft_atoi(const char *s)
 {
-    usleep(ms * 1000);
-}
+    int i = 0;
+    long number = 0;
+    int sign = 1;
 
-// Función para obtener el timestamp actual en milisegundos
-long current_time_ms(void)
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
-}
-
-// Función: filósofo piensa
-void think(int id)
-{
-    printf("[%ld ms] Filósofo %d está pensando 🧠\n", current_time_ms(), id);
-    precise_sleep(500); // pensar por 0.5 segundos
-}
-
-// Función: filósofo toma tenedores (lock)
-void take_forks(int id)
-{
-    pthread_mutex_lock(&fork_mutex);
-    printf("[%ld ms] Filósofo %d ha tomado los tenedores 🍴\n", current_time_ms(), id);
-}
-
-// Función: filósofo come
-void eat(int id)
-{
-    printf("[%ld ms] Filósofo %d está comiendo 🍝\n", current_time_ms(), id);
-    precise_sleep(2000); // comer por 2 segundos
-}
-
-// Función: filósofo suelta tenedores (unlock)
-void put_down_forks(int id)
-{
-    pthread_mutex_unlock(&fork_mutex);
-    printf("[%ld ms] Filósofo %d ha soltado los tenedores 🍴\n", current_time_ms(), id);
-}
-
-// Función: filósofo duerme
-void sleep_philo(int id)
-{
-    printf("[%ld ms] Filósofo %d está durmiendo 😴\n", current_time_ms(), id);
-    precise_sleep(1000); // dormir por 1 segundo
-}
-
-// Función principal de vida del filósofo
-void *philosopher_life(void *arg)
-{
-    int id = *(int *)arg;
-    int cycles = 3; // Cada filósofo repite 3 ciclos
-
-    while (cycles--)
+    while (s[i] == ' ' || s[i] == '\t' || s[i] == '\n' || s[i] == '\r'
+        || s[i] == '\v' || s[i] == '\f')
+        i++;
+    if (s[i] == '-')
     {
-        think(id);
-        take_forks(id);
-        eat(id);
-        put_down_forks(id);
-        sleep_philo(id);
+        sign = -1;
+        i++;
     }
-    return NULL;
+    else if (s[i] == '+')
+        i++;
+    while (s[i] >= '0' && s[i] <= '9')
+    {
+        number = number * 10 + s[i] - '0';
+        i++;
+    }
+    return (number * sign);
 }
 
-int main(void)
+int validate_args(int argc, char **argv)
 {
-    pthread_t philosopher_1;
-    pthread_t philosopher_2;
-    int id1 = 1;
-    int id2 = 2;
+    int num_philos;
+    int time_to_die;
+    int time_to_eat;
+    int time_to_sleep;
+    int meals_required;
 
-    pthread_mutex_init(&fork_mutex, NULL);
+    if (argc == 6)
+    {
+        num_philos = ft_atoi(argv[1]);
+        time_to_die = ft_atoi(argv[2]);
+        time_to_eat = ft_atoi(argv[3]);
+        time_to_sleep = ft_atoi(argv[4]);
+        meals_required = ft_atoi(argv[5]);
+        if (num_philos <= 0 || time_to_die <= 0 || time_to_eat <= 0 || time_to_sleep <= 0 || meals_required <= 0)
+            return (0);
+        return (1);
+    }
+    else if (argc == 5)
+    {
+        num_philos = ft_atoi(argv[1]);
+        time_to_die = ft_atoi(argv[2]);
+        time_to_eat = ft_atoi(argv[3]);
+        time_to_sleep = ft_atoi(argv[4]);
+        if (num_philos <= 0 || time_to_die <= 0 || time_to_eat <= 0 || time_to_sleep <= 0)
+            return (0);
+        return (1);
+    }
+    return (0);
+}
 
-    pthread_create(&philosopher_1, NULL, philosopher_life, &id1);
-    pthread_create(&philosopher_2, NULL, philosopher_life, &id2);
+int main(int argc, char **argv)
+{
+    t_data *data;
 
-    pthread_join(philosopher_1, NULL);
-    pthread_join(philosopher_2, NULL);
+    if (!validate_args(argc, argv))
+    {
+        printf("Error: argumentos inválidos.\n");
+        return (1);
+    }
+    if (!data_init(&data, argv, argc))
+    {
+        printf("Error: fallo en la inicialización de datos.\n");
+        return (1);
+    }
 
-    pthread_mutex_destroy(&fork_mutex);
-    return 0;
+    pthread_detach(data->death_monitor);
+    if (data->meals_required > 0)
+        pthread_detach(data->meals_monitor);
+    wait_thread(data->philo);
+    free_data(&data);
+    return (0);
 }
