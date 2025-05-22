@@ -6,35 +6,38 @@
 #    By: yuliano <yuliano@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/04/26 16:13:31 by ypacileo          #+#    #+#              #
-#    Updated: 2025/05/10 19:42:12 by yuliano          ###   ########.fr        #
+#    Updated: 2025/05/22 22:47:28 by yuliano          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
+SRC_DIR = ./src
+OBJ_DIR = ./obj
+CFLAGS = -Wall -Wextra -Werror  -I./ -fPIC -g -O0
 
-# Flags para compilación normal y depuración
-CFLAGS = -Wall -Wextra -Werror -fPIC -g -O0
+SRC = main.c thread_init.c thread_states.c tools.c aux_thread_init.c \
+    death_monitor.c meals_monitor.c
 
-SRC = main.c thread_init.c thread_states.c tools.c
-OBJ = $(SRC:.c=.o)
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
+SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC))
 
-# Regla principal
 all: $(NAME)
 
-# Regla para compilar el ejecutable
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) -lpthread
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -lpthread -o $(NAME)
+	@echo "✅ ready"
 
-# Regla para limpiar los archivos objeto
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 clean:
-	rm -f $(OBJ)
+	@rm -rf $(OBJ_DIR)
 
-# Regla para limpiar todo, incluyendo el ejecutable
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
+	@echo "✅ total cleaning"
 
-# Regla para recompilar desde cero
 re: fclean all
 
-# Declaración de reglas que no son archivos
 .PHONY: all clean fclean re
