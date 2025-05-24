@@ -4,7 +4,7 @@
 log_file="philo_log.txt"
 
 # Número total de filósofos y mínimo de comidas
-total=30
+total=5
 min_comidas=3
 
 for ((i = 1; i <= total; i++)); do

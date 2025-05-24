@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   thread_states.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuliano <yuliano@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ypacileo <ypacileo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:30:21 by yuliano           #+#    #+#             */
-/*   Updated: 2025/05/22 22:50:56 by yuliano          ###   ########.fr       */
+/*   Updated: 2025/05/24 14:57:12 by ypacileo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ void	put_down_forks(t_philo *philo)
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 	}
+	print_state(philo, "has put down both forks");
 }
 
 /**

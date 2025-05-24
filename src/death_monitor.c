@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   death_monitor.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuliano <yuliano@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ypacileo <ypacileo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 21:34:32 by yuliano           #+#    #+#             */
-/*   Updated: 2025/05/22 22:52:34 by yuliano          ###   ########.fr       */
+/*   Updated: 2025/05/24 15:34:53 by ypacileo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	handle_philo_death(t_data *data, int dead_idx)
 	data->someone_died = 1;
 	pthread_mutex_unlock(data->someone_died_mutex);
 	pthread_mutex_lock(data->write_mutex);
-	printf("[%7lld ms] El filósofo %d murió\n", \
+	printf("[%8lld ms] Philosopher %d died\n", \
 		get_time() - data->start_time, data->philo[dead_idx].id);
 	pthread_mutex_unlock(data->write_mutex);
 }
@@ -103,7 +103,7 @@ void	*death_monitor(void *arg)
 			handle_philo_death(data, dead_idx);
 			return (NULL);
 		}
-		usleep(5000);
+		usleep(2000);
 	}
 	return (NULL);
 }

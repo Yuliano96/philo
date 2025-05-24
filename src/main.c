@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuliano <yuliano@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ypacileo <ypacileo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 18:18:50 by ypacileo          #+#    #+#             */
-/*   Updated: 2025/05/22 22:46:31 by yuliano          ###   ########.fr       */
+/*   Updated: 2025/05/24 15:41:12 by ypacileo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,11 +81,11 @@ int	main(int argc, char **argv)
 	if (ft_atoi(argv[1]) == 1)
 	{
 		start = get_time();
-		printf("[%7ld ms] Philosopher 1 is thinking\n", get_time() - start);
-		printf("[%7ld ms] Philosopher 1 has taken the left fork\n", \
+		printf("[%8ld ms] Philosopher 1 is thinking\n", get_time() - start);
+		printf("[%8ld ms] Philosopher 1 has taken the left fork\n", \
 			get_time() - start);
 		usleep(ft_atoi(argv[2]) * 1000);
-		printf("[%7ld ms] Philosopher 1 died\n", get_time() - start);
+		printf("[%8ld ms] Philosopher 1 died\n", get_time() - start);
 		return (0);
 	}
 	if (!data_init(&data, argv, argc))

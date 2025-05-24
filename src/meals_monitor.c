@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   meals_monitor.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuliano <yuliano@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ypacileo <ypacileo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/22 21:47:23 by yuliano           #+#    #+#             */
-/*   Updated: 2025/05/22 22:51:50 by yuliano          ###   ########.fr       */
+/*   Updated: 2025/05/24 14:52:35 by ypacileo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ void	ft_usleep(size_t time_in_ms, t_philo *philo)
 void	think(t_philo *philo)
 {
 	print_state(philo, "is thinking");
-	ft_usleep(25, philo);
 }
 
 /**

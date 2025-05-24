@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tools.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yuliano <yuliano@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ypacileo <ypacileo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/03 16:39:21 by yuliano           #+#    #+#             */
-/*   Updated: 2025/05/18 23:19:26 by yuliano          ###   ########.fr       */
+/*   Updated: 2025/05/24 15:34:29 by ypacileo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	print_state(t_philo *philo, char *str)
 	if (!philo->data->someone_died)
 	{
 		pthread_mutex_lock(philo->data->write_mutex);
-		printf("[%7lld ms] Philosopher %d %s\n", \
+		printf("[%8lld ms] Philosopher %d %s\n", \
 			get_time() - philo->data->start_time, philo->id, str);
 		pthread_mutex_unlock(philo->data->write_mutex);
 	}
