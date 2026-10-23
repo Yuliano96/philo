@@ -1,162 +1,212 @@
 # Philosophers
 
-• Uno o más filósofos se sientan en una mesa redonda. En el centro de la mesa se encuentra un gran bol de espaguetis.
+**A concurrent programming project developed in C as part of the 42 School curriculum.**
 
-• Los filósofos solo pueden comer, pensar, o dormir.
-  Mientras están comiendo, no pueden pensar ni dormir;
-  Mientras están pensando, no pueden dormir ni comer;
-  Y, por supuesto, mientras están durmiendo, no pueden comer ni pensar.
-  
-• También hay tenedores en la mesa, tantos tenedores como filósofos.
+## Overview
 
-• Porque coger y comer espaguetis con un solo tenedor puede ser incomodo, los filósofos deben tomar el tenedor de la derecha y el de la izquierda, uno en cada mano.
+Philosophers is a simulation of the classic **Dining Philosophers Problem**, a synchronization problem in concurrent programming.
 
-• Cuándo un filósofo termine de comer, dejará los tenedores en la mesa e inmediatamente empezará a dormir. Una vez se despierte, empezará a pensar nuevamente.
-  La simulación se detendrá cuando un filósofo muere por inanición.
-  
-• Todos los filósofos necesitan comer y nunca deben morir de hambre.
+In this simulation, several philosophers sit around a table and alternate between three activities: **thinking, eating, and sleeping**.
 
-• Los filósofos no hablan entre ellos.
+Each philosopher needs two forks to eat, but each fork is shared between neighboring philosophers.
 
-• Los filósofos no saben si otro filósofo va a morir.
+The main challenge is to coordinate multiple threads while managing shared resources and avoiding synchronization problems such as **race conditions** and **deadlocks**.
 
-• ¡No debería hacer falta decir que todos deben evitar morir!
+The project uses **POSIX threads (`pthread`)** to represent philosophers and **mutexes** to synchronize access to shared resources.
 
-En este proyecto, aprenderé los principios básico de hilar un proceso, a como crear hilos y descubriré los mutex.
+It also includes monitoring mechanisms to detect when a philosopher dies and when all philosophers have completed the required number of meals.
 
-Este proyecto, lo divideré en varias sesiones:
+## Technical Concepts
 
+### POSIX Threads
 
-# 📚 sesión 1: Entorno base y repaso de herramientas
-Preparar tu carpeta philo/.
+Each philosopher is represented by a separate thread created using `pthread_create()`.
 
-Crear tu Makefile básico y el archivo philo.h.
+Threads allow multiple philosophers to perform their activities concurrently while sharing the same process memory.
 
-Hacer mini pruebas:
+### Mutex Synchronization
 
-Crear un hilo simple (pthread_create y pthread_join).
+Each fork is represented by a POSIX mutex (`pthread_mutex_t`).
 
-Usar un mutex simple (pthread_mutex_init, lock, unlock, destroy).
+A philosopher must acquire both forks before eating.
 
-Practicar con gettimeofday y usleep.
+Mutexes ensure that two neighboring philosophers cannot use the same fork simultaneously.
 
-# Objetivo final de la sesión:
-Saber crear hilos, mutexes, y medir tiempo de forma básica.
+After eating, the philosopher releases both mutexes, allowing other philosophers to access the shared resources.
 
-# ⚙️ Sesión 2: Diseño de estructuras
-Definir tus structs:
+### Deadlock Prevention
 
-t_philo (un filósofo).
+The implementation uses different fork acquisition orders depending on the philosopher's ID:
 
-t_data (datos generales de la simulación).
+- Even-numbered philosophers acquire the right fork first.
+- Odd-numbered philosophers acquire the left fork first.
 
-¿Qué debería tener cada struct? (IDs, mutexes, tiempos, punteros a forks...).
+This strategy prevents all philosophers from attempting to acquire their forks in the same order, helping avoid circular waiting conditions.
 
-Planear cómo los hilos recibirán la información (por punteros, no globals).
+### Monitoring
 
-# Objetivo final de la sesión:
-Tener philo.h completo y las estructuras bien pensadas para poder trabajar.
+The simulation uses monitoring threads to detect when a philosopher exceeds the maximum allowed time without eating.
 
-# 🍝 Sesión 3: Inicialización de la simulación
-Inicializar los datos:
+An additional monitor checks whether all philosophers have completed the required number of meals when the optional argument is provided.
 
-Parsear argumentos del programa.
+## Compilation & Usage
 
-Crear e inicializar los mutexes (tenedores).
+### Compilation
 
-Crear e inicializar los filósofos (cada uno con su ID, tiempos, punteros a forks).
+Clone the repository and compile the project using `make`:
 
-Lanzar todos los hilos de filósofos (pthread_create en bucle).
+```bash
+git clone https://github.com/Yuliano96/philo.git
+cd philo
+make
+```
 
-Objetivo final de la sesión:
-Que todos los filósofos existan, estén vivos y puedan hacer printf("Soy el filosofo X").
+The compilation generates an executable named `philo`.
 
-# 🧠 Sesión 4: Lógica de vida del filósofo
-Dentro del hilo:
+Available Makefile commands:
 
-think → take forks → eat → sleep → repeat.
+| Command | Description |
+|---|---|
+| `make` | Compiles the project. |
+| `make clean` | Removes object files. |
+| `make fclean` | Removes object files and the executable. |
+| `make re` | Rebuilds the project from scratch. |
 
-Implementar:
+### Usage
 
-Tomar el mutex izquierdo y derecho.
+Run the program with the following arguments:
 
-Comer (usleep el tiempo de comer).
+```bash
+./philo number_of_philosophers time_to_die time_to_eat time_to_sleep [number_of_meals]
+```
 
-Dejar los tenedores (unlock los mutexes).
+All time values are expressed in milliseconds.
 
-Dormir (usleep el tiempo de dormir).
+The optional `number_of_meals` argument specifies how many times each philosopher must eat before the simulation can finish successfully.
 
-Pensar.
+### Examples
 
-# Objetivo final de la sesión:
-Ver un bucle de los filósofos comiendo, durmiendo y pensando en orden.
+**Example 1 — Basic simulation**
 
-# 💀 Sesión 5: Detección de muerte
-Crear un hilo monitor o función dentro de cada filósofo:
+```bash
+./philo 5 800 200 200
+```
 
-Controlar si un filósofo supera su time_to_die sin comer.
+Starts a simulation with five philosophers.
 
-Cuando un filósofo muere, imprimirlo (timestamp X died) y terminar la simulación.
+**Example 2 — Limited number of meals**
 
-Asegurarse de que:
+```bash
+./philo 5 800 200 200 5
+```
 
-El primer filósofo que muere se detecta en menos de 10ms.
+Starts five philosophers and allows the simulation to finish when each philosopher has eaten at least five times.
 
-Después de una muerte, todo debe terminar ordenadamente.
+**Example 3 — Philosopher death**
 
-# Objetivo final de la sesión:
-Control de muerte funcionando correctamente.
+```bash
+./philo 1 800 200 200
+```
 
-# 🍽️ Sesión 6: Argumento opcional — número de comidas
-Manejar el quinto argumento (number_of_times_each_philosopher_must_eat).
+Starts a simulation with one philosopher, who cannot acquire two forks and eventually dies.
 
-Contar cuántas veces ha comido cada filósofo.
+## Testing
 
-Terminar la simulación si todos han comido suficiente.
+The project was successfully validated at **42 School**.
 
-# Objetivo final de la sesión:
-Parar la simulación correctamente si todos comen las veces requeridas.
+Several tests were performed to verify philosopher synchronization, meal completion, memory management, and thread safety.
 
-# 🧹 Sesión 7: Limpieza y validaciones
-Liberar toda la memoria.
+### Simulation Tests
 
-Destruir todos los mutexes.
+| Test | Description | Result |
+|---|---|---|
+| Single philosopher | Verifies death detection when only one fork is available. | ✅ PASS |
+| 5 philosophers | Verifies that all philosophers eat at least 3 times without dying. | ✅ PASS |
+| 100 philosophers | Stress test with 100 concurrent philosophers, each completing at least 3 meals. | ✅ PASS |
 
-Manejar errores si los argumentos de entrada están mal.
+### Automated Meal Verification
 
-Probar todo usando valgrind (sin memory leaks).
+The repository includes a Bash script called `check_meals.sh`.
 
-Ajustar el Makefile si es necesario.
+It verifies that each philosopher has eaten the required number of times and checks whether any philosopher died.
 
-Objetivo final de la sesión:
-Proyecto funcionando limpio, sin leaks, sin errores.
+Example:
 
-# 🎉 Sesión 8: Pruebas fuertes
-Hacer tests brutales:
+```bash
+./philo 100 800 200 200 3 > philo_log.txt
+bash check_meals.sh 100 3
+```
 
-Muchos filósofos (100, 200...).
+The script reports the result for each philosopher and displays a final success or failure message.
 
-Tiempos muy bajos.
+### Concurrency Analysis — Helgrind
 
-Simulaciones largas.
+Helgrind was used to analyze thread synchronization and detect potential race conditions.
 
-Buscar condiciones de carrera o deadlocks (forzar errores para ver si aparecen).
+```bash
+valgrind --tool=helgrind \
+    --log-file=helgrind.log \
+    ./philo 5 800 200 200 3
+```
 
-Afinar detalles de logs (printf) para que no se mezclen.
+**Result:** `ERROR SUMMARY: 0 errors from 0 contexts`
 
-# Objetivo final de la sesión:
-Estar listo para defensa.
+No concurrency errors were reported in this test.
 
-# Resumen: 
-Sesión | Objetivo
-1 | Hilos, mutexes, usleep, gettimeofday
-2 | Definir structs (t_philo, t_data)
-3 | Inicializar datos y crear hilos
-4 | Implementar ciclo de vida (comer, dormir, pensar)
-5 | Detectar muerte y terminar simulación
-6 | Manejar número de comidas
-7 | Memoria, errores, makefile
-8 | Testing brutal y afinar logs
+### Memory Analysis — Memcheck
 
-(Thinking) ---> (Take forks) ---> (Eating) ---> (Drop forks) ---> (Sleeping) ---> (Thinking) ...
+Valgrind Memcheck was used to check for memory leaks and invalid memory accesses.
 
+```bash
+valgrind --tool=memcheck \
+    --leak-check=full \
+    --show-leak-kinds=all \
+    --track-origins=yes \
+    ./philo 5 2000 200 200 3
+```
+
+**Results:**
+
+- 14 memory allocations.
+- 14 memory deallocations.
+- 0 bytes allocated at program exit.
+- 0 reported memory errors.
+
+All allocated heap memory was released during this test.
+
+## Project Structure
+
+```text
+philo/
+├── Makefile              # Compiles the project
+├── README.md             # Project documentation
+├── philo.h               # Structures and function declarations
+├── check_meals.sh        # Automated meal verification script
+├── docs/
+│   └── LEARNING_NOTES.md # Original project learning notes
+└── src/
+    ├── main.c            # Entry point and argument validation
+    ├── thread_init.c     # Philosopher and thread initialization
+    ├── aux_thread_init.c # Auxiliary initialization functions
+    ├── thread_states.c   # Philosopher lifecycle: think, eat, sleep
+    ├── death_monitor.c   # Detects philosopher deaths
+    ├── meals_monitor.c   # Monitors required meals
+    └── tools.c           # Utility functions
+```
+
+## Key Learnings
+
+This project helped me strengthen my understanding of concurrent programming and synchronization in C.
+
+Through its development, I learned how to:
+
+- Create and manage multiple threads using POSIX Threads.
+- Identify shared resources and protect them with mutexes.
+- Design synchronization strategies to reduce the risk of deadlocks.
+- Coordinate thread execution and monitor shared state.
+- Debug concurrent programs using Valgrind Helgrind.
+- Verify memory management using Valgrind Memcheck.
+
+---
+
+My original project plan and study notes are preserved in [docs/LEARNING_NOTES.md](docs/LEARNING_NOTES.md).
